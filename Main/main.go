@@ -68,17 +68,21 @@ func main() {
 	go runMonitorNetTicker()
 	gin.SetMode(gin.DebugMode)
 	r := gin.Default()
+	//启动静态服务
 	r.Static("/resources","../Views/")
 	r.LoadHTMLGlob("../Views/index.html")
 	r.GET("/", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "index.html", gin.H{})
 	})
+	//监控cpu
 	r.GET("/monitorCpu", func(c *gin.Context) {
 		WsHandler(c.Writer, c.Request)
 	})
+	//监控网络
 	r.GET("/monitorNet", func(c *gin.Context) {
 		WsHandler(c.Writer, c.Request)
 	})
+	//监控进程
 	r.GET("/monitorProcess", func(c *gin.Context) {
 		WsHandler(c.Writer, c.Request)
 	})
