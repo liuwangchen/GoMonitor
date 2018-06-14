@@ -68,7 +68,8 @@ func main() {
 	go runMonitorNetTicker()
 	gin.SetMode(gin.DebugMode)
 	r := gin.Default()
-	r.LoadHTMLGlob("../Views/*")
+	r.Static("/resources","../Views/")
+	r.LoadHTMLGlob("../Views/index.html")
 	r.GET("/", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "index.html", gin.H{})
 	})
