@@ -9,7 +9,32 @@
     <script type="text/javascript" src="resources/static/jquery.min.js"></script>
     <script type="text/javascript" src="resources/static/jquery.easyui.min.js"></script>
     <script type="text/javascript" src="resources/static/go.monitor.js"></script>
+
+    <script type="text/javascript">
+        var websocket = new WebSocket('ws://'+window.location.host+'/monitorCpu');
+        if (websocket.readyState===1) {
+            websocket.send("hello");//向服务器发送消息
+        }else{
+            //do something
+        }
+
+        websocket.onopen = function (evt) {
+        //已经建立连接
+        };
+        websocket.onclose = function (evt) {
+        //已经关闭连接
+        };
+        websocket.onmessage = function (evt) {
+        //收到服务器消息，使用evt.data提取
+            var evtObj = $.parseJSON( evt.data );
+            console.log(evtObj[0].name);
+        };
+        websocket.onerror = function (evt) {
+        //产生异常
+        };
+    </script>
 </head>
+<body>
 <h2>Process status</h2>
 <p>This page displays the state of the process in real time.</p>
 <form id = "processStatus" action="这里写后台数据接口" method="post">
@@ -26,6 +51,21 @@
         </thead>
     </table>
 </form>
+
+<table id="cupstatus" class="easyui-datagrid" title="CPU status" style="width:100%">
+    <thead>
+        <tr>
+            <th data-options="field:'name',width:scaleWidth(0.5),align:'right'">name</th>
+            <th data-options="field:'used',width:scaleWidth(0.4),align:'right'">used</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>-</td>
+            <td>-</td>
+        </tr>
+    </tbody>
+</table>
 
 <div style="margin:20px 0;"></div>
 <div class="easyui-panel">
