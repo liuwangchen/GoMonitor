@@ -11,46 +11,72 @@
     <script type="text/javascript" src="resources/static/go.monitor.js"></script>
 
     <script type="text/javascript">
-        var websocket = new WebSocket('ws://'+window.location.host+'/monitorCpu');
-        if (websocket.readyState===1) {
-            websocket.send("hello");//向服务器发送消息
-        }else{
-            //do something
-        }
+        //cpu
+        var cpusocket = new WebSocket('ws://'+window.location.host+'/monitorCpu');
+        cpusocket.onmessage = function (evt) {
+            var data = $.parseJSON(evt.data);
+            $('#cupstatus').datagrid('loadData',data);
+        };
 
-        websocket.onopen = function (evt) {
-        //已经建立连接
+        //net
+        var netsocket = new WebSocket('ws://'+window.location.host+'/monitorNet');
+        netsocket.onmessage = function (evt) {
+            var data = $.parseJSON(evt.data);
+            $('#netstatus').datagrid('loadData',data);
+            console.log(evt.data);
         };
-        websocket.onclose = function (evt) {
-        //已经关闭连接
-        };
-        websocket.onmessage = function (evt) {
-        //收到服务器消息，使用evt.data提取
-            var evtObj = $.parseJSON( evt.data );
-            console.log(evtObj[0].name);
-        };
-        websocket.onerror = function (evt) {
-        //产生异常
+
+        //process
+        var prosocket = new WebSocket('ws://'+window.location.host+'/monitorProcess');
+        prosocket.onmessage = function (evt) {
+            var data = $.parseJSON(evt.data);
+            $('#prostatus').datagrid('loadData',data);
         };
     </script>
 </head>
 <body>
 <h2>Process status</h2>
 <p>This page displays the state of the process in real time.</p>
-<form id = "processStatus" action="这里写后台数据接口" method="post">
-    <table class="easyui-datagrid" title="Process status" style="width:100%"
-           data-options="singleSelect:true,collapsible:true,url:'datagrid_data1.json',method:'get'">
-        <thead>
+<table id="prostatus" class="easyui-datagrid" title="Process status" style="width:100%"
+       data-options="singleSelect:true,collapsible:true,url:'datagrid_data1.json',method:'get'">
+    <thead>
         <tr>
-            <th data-options="field:'itemid',width:scaleWidth(0.2),align:'right'">Process</th>
-            <th data-options="field:'productid',width:scaleWidth(0.2),align:'right'">Status</th>
-            <th data-options="field:'listprice',width:scaleWidth(0.2),align:'right'">Uptime</th>
-            <th data-options="field:'unitcost',width:scaleWidth(0.2) ,align:'right'">CPU Total</th>
-            <th data-options="field:'attr1',width:scaleWidth(0.2),align:'right'">Memory Total</th>
+            <th data-options="field:'name',width:scaleWidth(0.2),align:'right'">Process Name</th>
+            <th data-options="field:'id',width:scaleWidth(0.1),align:'right'">Process Id</th>
+            <th data-options="field:'memory_percent',width:scaleWidth(0.2),align:'right'">Memory Percent</th>
+            <th data-options="field:'cpu_percent',width:scaleWidth(0.2) ,align:'right'">CPU Percent</th>
+            <th data-options="field:'status',width:scaleWidth(0.1),align:'right'">Status</th>
         </tr>
-        </thead>
-    </table>
-</form>
+    </thead>
+    <tbody>
+        <tr>
+            <td id="name">-</td>
+            <td id="id">-</td>
+            <td id="memory_percent">-</td>
+            <td id="cpu_percent">-</td>
+            <td id="status">-</td>
+        </tr>
+    </tbody>
+</table>
+
+<table id="netstatus" class="easyui-datagrid" title="Process status" style="width:100%"
+       data-options="singleSelect:true,collapsible:true,url:'datagrid_data1.json',method:'get'">
+    <thead>
+        <tr>
+            <th data-options="field:'name',width:scaleWidth(0.2),align:'right'">Name</th>
+            <th data-options="field:'bytesSent',width:scaleWidth(0.1),align:'right'">BytesSent</th>
+            <th data-options="field:'bytesRecv',width:scaleWidth(0.2),align:'right'">BytesRecv</th>
+            <th data-options="field:'packetsSent',width:scaleWidth(0.2) ,align:'right'">PacketsSent</th>
+            <th data-options="field:'packetsRecv',width:scaleWidth(0.1),align:'right'">PacketsRecv</th>
+            <th data-options="field:'errin',width:scaleWidth(0.2),align:'right'">Errin</th>
+            <th data-options="field:'errout',width:scaleWidth(0.1),align:'right'">Errout</th>
+            <th data-options="field:'dropin',width:scaleWidth(0.2),align:'right'">Dropin</th>
+            <th data-options="field:'dropout',width:scaleWidth(0.2) ,align:'right'">Dropout</th>
+            <th data-options="field:'fifoin',width:scaleWidth(0.1),align:'right'">Fifoin</th>
+            <th data-options="field:'fifoout',width:scaleWidth(0.1),align:'right'">Fifoout</th>
+        </tr>
+    </thead>
+</table>
 
 <table id="cupstatus" class="easyui-datagrid" title="CPU status" style="width:100%">
     <thead>
@@ -61,8 +87,8 @@
     </thead>
     <tbody>
         <tr>
-            <td>-</td>
-            <td>-</td>
+            <td id="name">-</td>
+            <td id="used">-</td>
         </tr>
     </tbody>
 </table>
