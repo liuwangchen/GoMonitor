@@ -101,7 +101,10 @@ func runMonitorProcessTicker() {
 			processInfo := Model.GetProcessInfo()
 			//推送
 			for k, conn := range connProcessMap {
-				err := conn.WriteJSON(processInfo)
+				err := conn.WriteJSON(gin.H{
+					"total" : len(processInfo),
+					"rows" : processInfo,
+				})
 				if err != nil {
 					delete(connProcessMap, k)
 					fmt.Println("当前订阅process的连接总数：", len(connProcessMap))
@@ -124,7 +127,10 @@ func runMonitorNetTicker() {
 			netInfo := Model.GetNetInfo()
 			//推送
 			for k, conn := range connNetMap {
-				err := conn.WriteJSON(netInfo)
+				err := conn.WriteJSON(gin.H{
+					"total" : len(netInfo),
+					"rows" : netInfo,
+				})
 				if err != nil {
 					delete(connNetMap, k)
 					fmt.Println("当前订阅net的连接总数：", len(connNetMap))
@@ -147,7 +153,10 @@ func runMonitorCpuTicker() {
 			cpuInfo := Model.GetCpuInfo()
 			//推送
 			for k, conn := range connCpuMap {
-				err := conn.WriteJSON(cpuInfo)
+				err := conn.WriteJSON(gin.H{
+					"total" : len(cpuInfo),
+					"rows" : cpuInfo,
+				})
 				if err != nil {
 					delete(connCpuMap, k)
 					fmt.Println("当前订阅cpu的连接总数：", len(connCpuMap))
