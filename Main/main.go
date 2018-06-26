@@ -7,7 +7,9 @@ import (
 	"log"
 	"net/http"
 	"runtime"
+	"strings"
 	"time"
+
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 )
@@ -32,32 +34,34 @@ var connNetMap = make(map[string]*websocket.Conn)
 var connProcessMap = make(map[string]*websocket.Conn)
 
 // 处理ws请求
-func WsHandler(w http.ResponseWriter, r *http.Request) {
-	var conn *websocket.Conn
-	var err error
-	conn, err = wsupgrader.Upgrade(w, r, nil)
-	if err != nil {
-		fmt.Println("连接出错：", err)
-		return
+func WsHandler(w http.ResponseWriter, r *http.Request, token string) bool {
+	//token不能为空
+	if len(strings.TrimSpace(token)) > 0 {
+		var conn *websocket.Conn
+		var err error
+		conn, err = wsupgrader.Upgrade(w, r, nil)
+		if err != nil {
+			fmt.Println("连接出错：", err)
+			return false
+		} else {
+			fmt.Println("连上了，地址：", token)
+			var connMap map[string]*websocket.Conn
+			switch r.RequestURI {
+			case "/monitorCpu":
+				connMap = connCpuMap
+			case "/monitorNet":
+				connMap = connNetMap
+			case "/monitorProcess":
+				connMap = connProcessMap
+			}
+			_, ok := connMap[token]
+			if !ok {
+				connMap[token] = conn
+			}
+			return true
+		}
 	} else {
-		remoteAddr := r.RemoteAddr
-		fmt.Println("连上了，地址：", remoteAddr)
-		var connMap map[string]*websocket.Conn
-		switch r.RequestURI {
-		case "/monitorCpu":
-			connMap = connCpuMap
-		case "/monitorNet":
-			connMap = connNetMap
-		case "/monitorProcess":
-			connMap = connProcessMap
-		}
-		_, ok := connMap[remoteAddr]
-		if !ok {
-			connMap[remoteAddr] = conn
-		}
-		fmt.Println("当前cpu连接总数：", len(connCpuMap))
-		fmt.Println("当前net连接总数：", len(connNetMap))
-		fmt.Println("当前process连接总数：", len(connProcessMap))
+		return false
 	}
 }
 
@@ -72,34 +76,39 @@ func main() {
 	r.Static("/resources", "../Views/")
 	r.LoadHTMLFiles("../Views/index.html")
 	r.GET("/", func(c *gin.Context) {
-		c.HTML(http.StatusOK, "index.html", gin.H{})
+		c.HTML(http.StatusOK, "index.html", gin.H{
+			"token": c.Request.RemoteAddr,
+		})
 	})
 	//监控cpu
 	r.GET("/monitorCpu", func(c *gin.Context) {
-		WsHandler(c.Writer, c.Request)
+		token := c.DefaultQuery("tocken", "")
+		if WsHandler(c.Writer, c.Request, token) {
+			fmt.Println("当前cpu连接总数：", len(connCpuMap))
+		}
 	})
 	//监控网络
 	r.GET("/monitorNet", func(c *gin.Context) {
-		WsHandler(c.Writer, c.Request)
+		token := c.DefaultQuery("tocken", "")
+		if WsHandler(c.Writer, c.Request, token) {
+			fmt.Println("当前net连接总数：", len(connNetMap))
+		}
 	})
 	//监控进程
 	r.GET("/monitorProcess", func(c *gin.Context) {
-		WsHandler(c.Writer, c.Request)
+		token := c.DefaultQuery("tocken", "")
+		if WsHandler(c.Writer, c.Request, token) {
+			fmt.Println("当前process连接总数：", len(connProcessMap))
+		}
 	})
 	r.GET("/cpuSort", func(c *gin.Context) {
-		UserSort.SetCpuSortConfig(c.Request.RemoteAddr, c.DefaultQuery("propertyName", ""), c.DefaultQuery("sort", "asc"))
-		_, ok := connCpuMap[c.Request.RemoteAddr]
-		c.JSON(http.StatusOK, ok)
+		UserSort.SetCpuSortConfig(c.DefaultQuery("tocken", ""), c.DefaultQuery("propertyName", ""), c.DefaultQuery("sort", "asc"))
 	})
 	r.GET("/netSort", func(c *gin.Context) {
-		UserSort.SetNetSortConfig(c.Request.RemoteAddr, c.DefaultQuery("propertyName", ""), c.DefaultQuery("sort", "asc"))
-		_, ok := connNetMap[c.Request.RemoteAddr]
-		c.JSON(http.StatusOK, ok)
+		UserSort.SetNetSortConfig(c.DefaultQuery("tocken", ""), c.DefaultQuery("propertyName", ""), c.DefaultQuery("sort", "asc"))
 	})
 	r.GET("/processSort", func(c *gin.Context) {
-		UserSort.SetProcessSortConfig(c.Request.RemoteAddr, c.DefaultQuery("propertyName", ""), c.DefaultQuery("sort", "asc"))
-		_, ok := connProcessMap[c.Request.RemoteAddr]
-		c.JSON(http.StatusOK, ok)
+		UserSort.SetProcessSortConfig(c.DefaultQuery("tocken", ""), c.DefaultQuery("propertyName", ""), c.DefaultQuery("sort", "asc"))
 	})
 	r.Run()
 }
@@ -124,7 +133,7 @@ func runMonitorCpuTicker() {
 				if err != nil {
 					delete(connCpuMap, k)
 					fmt.Println("当前订阅cpu的连接总数：", len(connCpuMap))
-					fmt.Println(conn.RemoteAddr().String(), "cpu用户已断开")
+					fmt.Println(k, "cpu用户已断开")
 				}
 			}
 		}
@@ -151,7 +160,7 @@ func runMonitorNetTicker() {
 				if err != nil {
 					delete(connNetMap, k)
 					fmt.Println("当前订阅net的连接总数：", len(connNetMap))
-					fmt.Println(conn.RemoteAddr().String(), "net用户已断开")
+					fmt.Println(k, "net用户已断开")
 				}
 			}
 		}
@@ -178,7 +187,7 @@ func runMonitorProcessTicker() {
 				if err != nil {
 					delete(connProcessMap, k)
 					fmt.Println("当前订阅process的连接总数：", len(connProcessMap))
-					fmt.Println(conn.RemoteAddr().String(), "process用户已断开")
+					fmt.Println(k, "process用户已断开")
 				}
 			}
 		}
