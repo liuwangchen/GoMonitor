@@ -132,6 +132,7 @@ func runMonitorCpuTicker() {
 				})
 				if err != nil {
 					delete(connCpuMap, k)
+					delete(UserSort.SortCpuConfig, k)
 					fmt.Println("当前订阅cpu的连接总数：", len(connCpuMap))
 					fmt.Println(k, "cpu用户已断开")
 				}
@@ -159,6 +160,7 @@ func runMonitorNetTicker() {
 				})
 				if err != nil {
 					delete(connNetMap, k)
+					delete(UserSort.SortNetConfig, k)
 					fmt.Println("当前订阅net的连接总数：", len(connNetMap))
 					fmt.Println(k, "net用户已断开")
 				}
@@ -186,6 +188,7 @@ func runMonitorProcessTicker() {
 				})
 				if err != nil {
 					delete(connProcessMap, k)
+					delete(UserSort.SortProcessConfig, k)
 					fmt.Println("当前订阅process的连接总数：", len(connProcessMap))
 					fmt.Println(k, "process用户已断开")
 				}

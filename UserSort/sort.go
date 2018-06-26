@@ -29,28 +29,28 @@ var SortNetConfig sortConfigMap = make(map[string]*SortConfig)
 //排序配置
 var SortProcessConfig sortConfigMap = make(map[string]*SortConfig)
 
-func (scm sortConfigMap) setSortConfig(address, propertyName, ad string) {
-	if config, ok := scm[address]; ok {
+func (scm sortConfigMap) setSortConfig(token, propertyName, ad string) {
+	if config, ok := scm[token]; ok {
 		config.PropertyName = propertyName
 		config.Ad = ad
 	} else {
-		scm[address] = &SortConfig{
+		scm[token] = &SortConfig{
 			PropertyName: propertyName,
 			Ad:           ad,
 		}
 	}
 }
 
-func SetCpuSortConfig(address, propertyName, ad string) {
-	SortCpuConfig.setSortConfig(address, propertyName, ad)
+func SetCpuSortConfig(token, propertyName, ad string) {
+	SortCpuConfig.setSortConfig(token, propertyName, ad)
 }
 
-func SetNetSortConfig(address, propertyName, ad string) {
-	SortNetConfig.setSortConfig(address, propertyName, ad)
+func SetNetSortConfig(token, propertyName, ad string) {
+	SortNetConfig.setSortConfig(token, propertyName, ad)
 }
 
-func SetProcessSortConfig(address, propertyName, ad string) {
-	SortProcessConfig.setSortConfig(address, propertyName, ad)
+func SetProcessSortConfig(token, propertyName, ad string) {
+	SortProcessConfig.setSortConfig(token, propertyName, ad)
 }
 
 type CustomCpuSort struct {
