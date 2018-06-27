@@ -10,6 +10,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/satori/go.uuid"
+
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 )
@@ -34,9 +36,9 @@ var connNetMap = make(map[string]*websocket.Conn)
 var connProcessMap = make(map[string]*websocket.Conn)
 
 // 处理ws请求
-func WsHandler(w http.ResponseWriter, r *http.Request, token string) bool {
+func WsHandler(w http.ResponseWriter, r *http.Request, uuid string) bool {
 	//token不能为空
-	if len(strings.TrimSpace(token)) > 0 {
+	if len(strings.TrimSpace(uuid)) > 0 {
 		var conn *websocket.Conn
 		var err error
 		conn, err = wsupgrader.Upgrade(w, r, nil)
@@ -44,7 +46,7 @@ func WsHandler(w http.ResponseWriter, r *http.Request, token string) bool {
 			fmt.Println("连接出错：", err)
 			return false
 		} else {
-			fmt.Println("连上了，地址：", token)
+			fmt.Println("连上了，地址：", uuid)
 			var connMap map[string]*websocket.Conn
 			switch r.RequestURI {
 			case "/monitorCpu":
@@ -54,9 +56,9 @@ func WsHandler(w http.ResponseWriter, r *http.Request, token string) bool {
 			case "/monitorProcess":
 				connMap = connProcessMap
 			}
-			_, ok := connMap[token]
+			_, ok := connMap[uuid]
 			if !ok {
-				connMap[token] = conn
+				connMap[uuid] = conn
 			}
 			return true
 		}
@@ -76,39 +78,41 @@ func main() {
 	r.Static("/resources", "../Views/")
 	r.LoadHTMLFiles("../Views/index.html")
 	r.GET("/", func(c *gin.Context) {
+		uid, _ := uuid.NewV4()
+		uidStr := uid.String()
 		c.HTML(http.StatusOK, "index.html", gin.H{
-			"token": c.Request.RemoteAddr,
+			"uuid": uidStr,
 		})
 	})
 	//监控cpu
 	r.GET("/monitorCpu", func(c *gin.Context) {
-		token := c.DefaultQuery("tocken", "")
-		if WsHandler(c.Writer, c.Request, token) {
+		uuid := c.DefaultQuery("uuid", "")
+		if WsHandler(c.Writer, c.Request, uuid) {
 			fmt.Println("当前cpu连接总数：", len(connCpuMap))
 		}
 	})
 	//监控网络
 	r.GET("/monitorNet", func(c *gin.Context) {
-		token := c.DefaultQuery("tocken", "")
-		if WsHandler(c.Writer, c.Request, token) {
+		uuid := c.DefaultQuery("uuid", "")
+		if WsHandler(c.Writer, c.Request, uuid) {
 			fmt.Println("当前net连接总数：", len(connNetMap))
 		}
 	})
 	//监控进程
 	r.GET("/monitorProcess", func(c *gin.Context) {
-		token := c.DefaultQuery("tocken", "")
-		if WsHandler(c.Writer, c.Request, token) {
+		uuid := c.DefaultQuery("uuid", "")
+		if WsHandler(c.Writer, c.Request, uuid) {
 			fmt.Println("当前process连接总数：", len(connProcessMap))
 		}
 	})
 	r.GET("/cpuSort", func(c *gin.Context) {
-		UserSort.SetCpuSortConfig(c.DefaultQuery("tocken", ""), c.DefaultQuery("propertyName", ""), c.DefaultQuery("sort", "asc"))
+		UserSort.SetCpuSortConfig(c.DefaultQuery("uuid", ""), c.DefaultQuery("propertyName", ""), c.DefaultQuery("sort", "asc"))
 	})
 	r.GET("/netSort", func(c *gin.Context) {
-		UserSort.SetNetSortConfig(c.DefaultQuery("tocken", ""), c.DefaultQuery("propertyName", ""), c.DefaultQuery("sort", "asc"))
+		UserSort.SetNetSortConfig(c.DefaultQuery("uuid", ""), c.DefaultQuery("propertyName", ""), c.DefaultQuery("sort", "asc"))
 	})
 	r.GET("/processSort", func(c *gin.Context) {
-		UserSort.SetProcessSortConfig(c.DefaultQuery("tocken", ""), c.DefaultQuery("propertyName", ""), c.DefaultQuery("sort", "asc"))
+		UserSort.SetProcessSortConfig(c.DefaultQuery("uuid", ""), c.DefaultQuery("propertyName", ""), c.DefaultQuery("sort", "asc"))
 	})
 	r.Run()
 }
