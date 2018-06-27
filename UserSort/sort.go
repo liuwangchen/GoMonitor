@@ -4,7 +4,7 @@ import (
 	"GoMonitor/Info"
 	"reflect"
 	"sort"
-
+	"strings"
 	"github.com/shirou/gopsutil/net"
 )
 
@@ -30,13 +30,15 @@ var SortNetConfig sortConfigMap = make(map[string]*SortConfig)
 var SortProcessConfig sortConfigMap = make(map[string]*SortConfig)
 
 func (scm sortConfigMap) setSortConfig(uuid, propertyName, ad string) {
-	if config, ok := scm[uuid]; ok {
-		config.PropertyName = propertyName
-		config.Ad = ad
-	} else {
-		scm[uuid] = &SortConfig{
-			PropertyName: propertyName,
-			Ad:           ad,
+	if len(strings.TrimSpace(uuid)) > 0 {
+		if config, ok := scm[uuid]; ok {
+			config.PropertyName = propertyName
+			config.Ad = ad
+		} else {
+			scm[uuid] = &SortConfig{
+				PropertyName: propertyName,
+				Ad:           ad,
+			}
 		}
 	}
 }
