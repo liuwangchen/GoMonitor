@@ -7,10 +7,7 @@ import (
 	"log"
 	"net/http"
 	"runtime"
-	"strings"
 	"time"
-
-	"github.com/satori/go.uuid"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
@@ -36,34 +33,30 @@ var connNetMap = make(map[string]*websocket.Conn)
 var connProcessMap = make(map[string]*websocket.Conn)
 
 // 处理ws请求
-func WsHandler(w http.ResponseWriter, r *http.Request, uuid string) bool {
-	//token不能为空
-	if len(strings.TrimSpace(uuid)) > 0 {
-		var conn *websocket.Conn
-		var err error
-		conn, err = wsupgrader.Upgrade(w, r, nil)
-		if err != nil {
-			fmt.Println("连接出错：", err)
-			return false
-		} else {
-			fmt.Println("连上了，地址：", uuid)
-			var connMap map[string]*websocket.Conn
-			switch r.RequestURI {
-			case "/monitorCpu":
-				connMap = connCpuMap
-			case "/monitorNet":
-				connMap = connNetMap
-			case "/monitorProcess":
-				connMap = connProcessMap
-			}
-			_, ok := connMap[uuid]
-			if !ok {
-				connMap[uuid] = conn
-			}
-			return true
-		}
+func WsHandler(w http.ResponseWriter, r *http.Request) (*websocket.Conn, bool) {
+	var conn *websocket.Conn
+	var err error
+	conn, err = wsupgrader.Upgrade(w, r, nil)
+	if err != nil {
+		fmt.Println("连接出错：", err)
+		return nil, false
 	} else {
-		return false
+		address := r.RemoteAddr
+		fmt.Println("连上了，地址：", address)
+		var connMap map[string]*websocket.Conn
+		switch r.RequestURI {
+		case "/monitorCpu":
+			connMap = connCpuMap
+		case "/monitorNet":
+			connMap = connNetMap
+		case "/monitorProcess":
+			connMap = connProcessMap
+		}
+		_, ok := connMap[address]
+		if !ok {
+			connMap[address] = conn
+		}
+		return conn, true
 	}
 }
 
@@ -78,41 +71,49 @@ func main() {
 	r.Static("/resources", "../Views/")
 	r.LoadHTMLFiles("../Views/index.html")
 	r.GET("/", func(c *gin.Context) {
-		uid, _ := uuid.NewV4()
-		uidStr := uid.String()
-		c.HTML(http.StatusOK, "index.html", gin.H{
-			"uuid": uidStr,
-		})
+		c.HTML(http.StatusOK, "index.html", gin.H{})
 	})
 	//监控cpu
 	r.GET("/monitorCpu", func(c *gin.Context) {
-		uuid := c.DefaultQuery("uuid", "")
-		if WsHandler(c.Writer, c.Request, uuid) {
+		if conn, isConn := WsHandler(c.Writer, c.Request); isConn {
 			fmt.Println("当前cpu连接总数：", len(connCpuMap))
+			for {
+				_, reply, err := conn.ReadMessage()
+				if err != nil {
+					break
+				} else {
+					RecieveCpu(string(reply), conn)
+				}
+			}
 		}
 	})
 	//监控网络
 	r.GET("/monitorNet", func(c *gin.Context) {
-		uuid := c.DefaultQuery("uuid", "")
-		if WsHandler(c.Writer, c.Request, uuid) {
+		if conn, isConn := WsHandler(c.Writer, c.Request); isConn {
 			fmt.Println("当前net连接总数：", len(connNetMap))
+			for {
+				_, reply, err := conn.ReadMessage()
+				if err != nil {
+					break
+				} else {
+					RecieveNet(string(reply), conn)
+				}
+			}
 		}
 	})
 	//监控进程
 	r.GET("/monitorProcess", func(c *gin.Context) {
-		uuid := c.DefaultQuery("uuid", "")
-		if WsHandler(c.Writer, c.Request, uuid) {
+		if conn, isConn := WsHandler(c.Writer, c.Request); isConn {
 			fmt.Println("当前process连接总数：", len(connProcessMap))
+			for {
+				_, reply, err := conn.ReadMessage()
+				if err != nil {
+					break
+				} else {
+					RecieveProcess(string(reply), conn)
+				}
+			}
 		}
-	})
-	r.GET("/cpuSort", func(c *gin.Context) {
-		UserSort.SetCpuSortConfig(c.DefaultQuery("uuid", ""), c.DefaultQuery("propertyName", ""), c.DefaultQuery("sort", "asc"))
-	})
-	r.GET("/netSort", func(c *gin.Context) {
-		UserSort.SetNetSortConfig(c.DefaultQuery("uuid", ""), c.DefaultQuery("propertyName", ""), c.DefaultQuery("sort", "asc"))
-	})
-	r.GET("/processSort", func(c *gin.Context) {
-		UserSort.SetProcessSortConfig(c.DefaultQuery("uuid", ""), c.DefaultQuery("propertyName", ""), c.DefaultQuery("sort", "asc"))
 	})
 	r.Run()
 }
@@ -199,4 +200,16 @@ func runMonitorProcessTicker() {
 			}
 		}
 	}
+}
+
+func RecieveCpu(message string, conn *websocket.Conn) {
+	//UserSort.SetCpuSortConfig(conn.RemoteAddr().String(), c.DefaultQuery("propertyName", ""), c.DefaultQuery("sort", "asc"))
+}
+
+func RecieveNet(message string, conn *websocket.Conn) {
+	//UserSort.SetCpuSortConfig(c.DefaultQuery("uuid", ""), c.DefaultQuery("propertyName", ""), c.DefaultQuery("sort", "asc"))
+}
+
+func RecieveProcess(message string, conn *websocket.Conn) {
+	//UserSort.SetCpuSortConfig(c.DefaultQuery("uuid", ""), c.DefaultQuery("propertyName", ""), c.DefaultQuery("sort", "asc"))
 }
