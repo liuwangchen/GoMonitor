@@ -82,7 +82,7 @@ func main() {
 				if err != nil {
 					break
 				} else {
-					RecieveCpu(string(reply), conn)
+					ReceiveCpu(string(reply), conn)
 				}
 			}
 		}
@@ -96,7 +96,7 @@ func main() {
 				if err != nil {
 					break
 				} else {
-					RecieveNet(string(reply), conn)
+					ReceiveNet(string(reply), conn)
 				}
 			}
 		}
@@ -110,7 +110,7 @@ func main() {
 				if err != nil {
 					break
 				} else {
-					RecieveProcess(string(reply), conn)
+					ReceiveProcess(string(reply), conn)
 				}
 			}
 		}
@@ -202,14 +202,14 @@ func runMonitorProcessTicker() {
 	}
 }
 
-func RecieveCpu(message string, conn *websocket.Conn) {
+func ReceiveCpu(message string, conn *websocket.Conn) {
 	//UserSort.SetCpuSortConfig(conn.RemoteAddr().String(), c.DefaultQuery("propertyName", ""), c.DefaultQuery("sort", "asc"))
 }
 
-func RecieveNet(message string, conn *websocket.Conn) {
+func ReceiveNet(message string, conn *websocket.Conn) {
 	//UserSort.SetCpuSortConfig(c.DefaultQuery("uuid", ""), c.DefaultQuery("propertyName", ""), c.DefaultQuery("sort", "asc"))
 }
 
-func RecieveProcess(message string, conn *websocket.Conn) {
+func ReceiveProcess(message string, conn *websocket.Conn) {
 	//UserSort.SetCpuSortConfig(c.DefaultQuery("uuid", ""), c.DefaultQuery("propertyName", ""), c.DefaultQuery("sort", "asc"))
 }
