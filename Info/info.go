@@ -2,6 +2,7 @@ package Info
 
 import (
 	"time"
+
 	"github.com/shirou/gopsutil/cpu"
 	"github.com/shirou/gopsutil/mem"
 	"github.com/shirou/gopsutil/net"
@@ -53,7 +54,7 @@ func GetMemoryInfo() MemoryInfo {
 
 func GetNetInfo() []net.IOCountersStat {
 	nv, _ := net.IOCounters(true)
-	return nv	
+	return nv
 }
 
 func GetProcessInfo() []ProcessInfo {
