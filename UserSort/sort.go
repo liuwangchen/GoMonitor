@@ -13,9 +13,14 @@ type CpuData []Info.CpuInfo
 type NetData []net.IOCountersStat
 type ProcessData []Info.ProcessInfo
 
+const (
+	ASC = iota
+	DESC
+)
+
 type SortConfig struct {
 	PropertyName string
-	Ad           string
+	Ad           int
 }
 
 //排序配置
@@ -34,19 +39,19 @@ func (scm sortConfigMap) setSortConfig(uuid, propertyName string) {
 	if len(strings.TrimSpace(uuid)) > 0 {
 		if config, ok := scm[uuid]; ok {
 			if config.PropertyName != propertyName {
-				config.Ad = "desc"
+				config.Ad = DESC
 			} else {
-				if config.Ad == "asc" {
-					config.Ad = "desc"
+				if config.Ad == ASC {
+					config.Ad = DESC
 				} else {
-					config.Ad = "asc"
+					config.Ad = ASC
 				}
 			}
 			config.PropertyName = propertyName
 		} else {
 			scm[uuid] = &SortConfig{
 				PropertyName: propertyName,
-				Ad:           "desc",
+				Ad:           DESC,
 			}
 		}
 	}
@@ -95,7 +100,7 @@ func (data CpuData) Sort(addrs string) CpuData {
 				return false
 			},
 		}
-		if sc.Ad == "asc" {
+		if sc.Ad == ASC {
 			sort.Sort(uc)
 		} else {
 			sort.Sort(sort.Reverse(uc))
@@ -135,7 +140,7 @@ func (data NetData) Sort(addrs string) NetData {
 				return false
 			},
 		}
-		if sc.Ad == "asc" {
+		if sc.Ad == ASC {
 			sort.Sort(uc)
 		} else {
 			sort.Sort(sort.Reverse(uc))
@@ -178,7 +183,7 @@ func (data ProcessData) Sort(addrs string) ProcessData {
 				return false
 			},
 		}
-		if sc.Ad == "asc" {
+		if sc.Ad == ASC {
 			sort.Sort(uc)
 		} else {
 			sort.Sort(sort.Reverse(uc))
