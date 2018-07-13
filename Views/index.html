@@ -1,5 +1,6 @@
 <html>
 <!DOCTYPE html>
+
 <head>
     <meta charset="UTF-8">
     <title>Basic Pagination - jQuery EasyUI Demo</title>
@@ -12,90 +13,129 @@
 
     <script type="text/javascript">
         //cpu
-        var cpusocket = new WebSocket('ws://'+window.location.host+'/monitorCpu');
+        var cpusocket = new WebSocket('ws://' + window.location.host + '/monitorCpu');
         cpusocket.onmessage = function (evt) {
             var data = $.parseJSON(evt.data);
-            $('#cupstatus').datagrid('loadData',data);
+            $('#cupstatus').datagrid('loadData', data);
         };
 
         //net
-        var netsocket = new WebSocket('ws://'+window.location.host+'/monitorNet');
+        var netsocket = new WebSocket('ws://' + window.location.host + '/monitorNet');
         netsocket.onmessage = function (evt) {
             var data = $.parseJSON(evt.data);
-            $('#netstatus').datagrid('loadData',data);
-            console.log(evt.data);
+            $('#netstatus').datagrid('loadData', data);
         };
 
         //process
-        var prosocket = new WebSocket('ws://'+window.location.host+'/monitorProcess');
+        var prosocket = new WebSocket('ws://' + window.location.host + '/monitorProcess');
         prosocket.onmessage = function (evt) {
             var data = $.parseJSON(evt.data);
-            $('#prostatus').datagrid('loadData',data);
+            $('#prostatus').datagrid('loadData', data);
         };
+
+        function processSort(property) {
+            prosocket.send("sort?property=" + property)
+        }
+
+        function netSort(property) {
+            netsocket.send("sort?property=" + property)
+        }
+
+        function cpuSort(property) {
+            cpusocket.send("sort?property=" + property)
+        }
     </script>
 </head>
+
 <body>
-<h2>Process status</h2>
-<p>This page displays the state of the process in real time.</p>
-<table id="prostatus" class="easyui-datagrid" title="Process status" style="width:100%"
-       data-options="singleSelect:true,collapsible:true,url:'datagrid_data1.json',method:'get'">
-    <thead>
-        <tr>
-            <th data-options="field:'name',width:scaleWidth(0.2),align:'right'">Process Name</th>
-            <th data-options="field:'id',width:scaleWidth(0.1),align:'right'">Process Id</th>
-            <th data-options="field:'memory_percent',width:scaleWidth(0.2),align:'right'">Memory Percent</th>
-            <th data-options="field:'cpu_percent',width:scaleWidth(0.2) ,align:'right'">CPU Percent</th>
-            <th data-options="field:'status',width:scaleWidth(0.1),align:'right'">Status</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td id="name">-</td>
-            <td id="id">-</td>
-            <td id="memory_percent">-</td>
-            <td id="cpu_percent">-</td>
-            <td id="status">-</td>
-        </tr>
-    </tbody>
-</table>
+    <h2>Process status</h2>
+    <p>This page displays the state of the process in real time.</p>
+    <table id="prostatus" class="easyui-datagrid" title="Process status" style="width:100%" data-options="singleSelect:true,collapsible:true,url:'datagrid_data1.json',method:'get'">
+        <thead>
+            <tr>
+                <th data-options="field:'name',width:scaleWidth(0.2),align:'right'">Process Name</th>
+                <th data-options="field:'id',width:scaleWidth(0.1),align:'right'">
+                    <span onclick="processSort('Id')">Process Id</span>
+                </th>
+                <th data-options="field:'memory_percent',width:scaleWidth(0.2),align:'right'">
+                    <span onclick="processSort('MemoryPercent')">Memory Percent</span>
+                </th>
+                <th data-options="field:'cpu_percent',width:scaleWidth(0.2) ,align:'right'">
+                    <span onclick="processSort('CPUPercent')">CPU Percent</span>
+                </th>
+                <th data-options="field:'status',width:scaleWidth(0.1),align:'right'">Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td id="name">-</td>
+                <td id="id">-</td>
+                <td id="memory_percent">-</td>
+                <td id="cpu_percent">-</td>
+                <td id="status">-</td>
+            </tr>
+        </tbody>
+    </table>
 
-<table id="netstatus" class="easyui-datagrid" title="Process status" style="width:100%"
-       data-options="singleSelect:true,collapsible:true,url:'datagrid_data1.json',method:'get'">
-    <thead>
-        <tr>
-            <th data-options="field:'name',width:scaleWidth(0.2),align:'right'">Name</th>
-            <th data-options="field:'bytesSent',width:scaleWidth(0.1),align:'right'">BytesSent</th>
-            <th data-options="field:'bytesRecv',width:scaleWidth(0.2),align:'right'">BytesRecv</th>
-            <th data-options="field:'packetsSent',width:scaleWidth(0.2) ,align:'right'">PacketsSent</th>
-            <th data-options="field:'packetsRecv',width:scaleWidth(0.1),align:'right'">PacketsRecv</th>
-            <th data-options="field:'errin',width:scaleWidth(0.2),align:'right'">Errin</th>
-            <th data-options="field:'errout',width:scaleWidth(0.1),align:'right'">Errout</th>
-            <th data-options="field:'dropin',width:scaleWidth(0.2),align:'right'">Dropin</th>
-            <th data-options="field:'dropout',width:scaleWidth(0.2) ,align:'right'">Dropout</th>
-            <th data-options="field:'fifoin',width:scaleWidth(0.1),align:'right'">Fifoin</th>
-            <th data-options="field:'fifoout',width:scaleWidth(0.1),align:'right'">Fifoout</th>
-        </tr>
-    </thead>
-</table>
+    <table id="netstatus" class="easyui-datagrid" title="Process status" style="width:100%" data-options="singleSelect:true,collapsible:true,url:'datagrid_data1.json',method:'get'">
+        <thead>
+            <tr>
+                <th data-options="field:'name',width:scaleWidth(0.2),align:'right'">Name</th>
+                <th data-options="field:'bytesSent',width:scaleWidth(0.1),align:'right'">BytesSent
+                    <span onclick="netSort('BytesSent')">BytesSent</span>
+                </th>
+                <th data-options="field:'bytesRecv',width:scaleWidth(0.2),align:'right'">BytesRecv
+                    <span onclick="netSort('BytesRecv')">BytesRecv</span>
+                </th>
+                <th data-options="field:'packetsSent',width:scaleWidth(0.2) ,align:'right'">PacketsSent
+                    <span onclick="netSort('PacketsSent')">PacketsSent</span>
+                </th>
+                <th data-options="field:'packetsRecv',width:scaleWidth(0.1),align:'right'">PacketsRecv
+                    <span onclick="netSort('PacketsRecv')">PacketsRecv</span>
+                </th>
+                <th data-options="field:'errin',width:scaleWidth(0.2),align:'right'">Errin
+                    <span onclick="netSort('Errin')">Errin</span>
+                </th>
+                <th data-options="field:'errout',width:scaleWidth(0.1),align:'right'">Errout
+                    <span onclick="netSort('Errout')">Errout</span>
+                </th>
+                <th data-options="field:'dropin',width:scaleWidth(0.2),align:'right'">Dropin
+                    <span onclick="netSort('Dropin')">Dropin</span>
+                </th>
+                <th data-options="field:'dropout',width:scaleWidth(0.2) ,align:'right'">Dropout
+                    <span onclick="netSort('Dropout')">Dropout</span>
+                </th>
+                <th data-options="field:'fifoin',width:scaleWidth(0.1),align:'right'">Fifoin
+                    <span onclick="netSort('Fifoout')">Fifoout</span>
+                </th>
+                <th data-options="field:'fifoout',width:scaleWidth(0.1),align:'right'">Fifoout
+                    <span onclick="netSort('Fifoout')">Fifoout</span>
+                </th>
+            </tr>
+        </thead>
+    </table>
 
-<table id="cupstatus" class="easyui-datagrid" title="CPU status" style="width:100%">
-    <thead>
-        <tr>
-            <th data-options="field:'name',width:scaleWidth(0.5),align:'right'">name</th>
-            <th data-options="field:'used',width:scaleWidth(0.4),align:'right'">used</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td id="name">-</td>
-            <td id="used">-</td>
-        </tr>
-    </tbody>
-</table>
+    <table id="cupstatus" class="easyui-datagrid" title="CPU status" style="width:100%">
+        <thead>
+            <tr>
+                <th data-options="field:'name',width:scaleWidth(0.5),align:'right'">name</th>
+                <th data-options="field:'used',width:scaleWidth(0.4),align:'right'">
+                    <span onclick="cpuSort('Used')">used</span>
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td id="name">-</td>
+                <td id="used">-</td>
+            </tr>
+        </tbody>
+    </table>
 
-<div style="margin:20px 0;"></div>
-<div class="easyui-panel">
-    <div class="easyui-pagination" data-options="total:114"></div>
-</div>
+    <div style="margin:20px 0;"></div>
+    <div class="easyui-panel">
+        <div class="easyui-pagination" data-options="total:114"></div>
+    </div>
 </body>
+
 </html>

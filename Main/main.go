@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"net/url"
 	"runtime"
 	"time"
 
@@ -203,13 +204,19 @@ func runMonitorProcessTicker() {
 }
 
 func ReceiveCpu(message string, conn *websocket.Conn) {
-	//UserSort.SetCpuSortConfig(conn.RemoteAddr().String(), c.DefaultQuery("propertyName", ""), c.DefaultQuery("sort", "asc"))
+	u, _ := url.Parse(message)
+	property := u.Query().Get("property")
+	UserSort.SetCpuSortConfig(conn.RemoteAddr().String(), property)
 }
 
 func ReceiveNet(message string, conn *websocket.Conn) {
-	//UserSort.SetCpuSortConfig(c.DefaultQuery("uuid", ""), c.DefaultQuery("propertyName", ""), c.DefaultQuery("sort", "asc"))
+	u, _ := url.Parse(message)
+	property := u.Query().Get("property")
+	UserSort.SetNetSortConfig(conn.RemoteAddr().String(), property)
 }
 
 func ReceiveProcess(message string, conn *websocket.Conn) {
-	//UserSort.SetCpuSortConfig(c.DefaultQuery("uuid", ""), c.DefaultQuery("propertyName", ""), c.DefaultQuery("sort", "asc"))
+	u, _ := url.Parse(message)
+	property := u.Query().Get("property")
+	UserSort.SetProcessSortConfig(conn.RemoteAddr().String(), property)
 }
