@@ -33,12 +33,16 @@ var SortProcessConfig sortConfigMap = make(map[string]*SortConfig)
 func (scm sortConfigMap) setSortConfig(uuid, propertyName string) {
 	if len(strings.TrimSpace(uuid)) > 0 {
 		if config, ok := scm[uuid]; ok {
-			config.PropertyName = propertyName
-			if config.Ad == "asc" {
+			if config.PropertyName != propertyName {
 				config.Ad = "desc"
 			} else {
-				config.Ad = "asc"
+				if config.Ad == "asc" {
+					config.Ad = "desc"
+				} else {
+					config.Ad = "asc"
+				}
 			}
+			config.PropertyName = propertyName
 		} else {
 			scm[uuid] = &SortConfig{
 				PropertyName: propertyName,
@@ -48,16 +52,16 @@ func (scm sortConfigMap) setSortConfig(uuid, propertyName string) {
 	}
 }
 
-func SetCpuSortConfig(uuid, propertyName string) {
-	SortCpuConfig.setSortConfig(uuid, propertyName)
+func SetCpuSortConfig(conn, propertyName string) {
+	SortCpuConfig.setSortConfig(conn, propertyName)
 }
 
-func SetNetSortConfig(uuid, propertyName string) {
-	SortNetConfig.setSortConfig(uuid, propertyName)
+func SetNetSortConfig(conn, propertyName string) {
+	SortNetConfig.setSortConfig(conn, propertyName)
 }
 
-func SetProcessSortConfig(uuid, propertyName string) {
-	SortProcessConfig.setSortConfig(uuid, propertyName)
+func SetProcessSortConfig(conn, propertyName string) {
+	SortProcessConfig.setSortConfig(conn, propertyName)
 }
 
 type CustomCpuSort struct {
