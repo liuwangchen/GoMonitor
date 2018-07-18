@@ -131,17 +131,19 @@ func runMonitorCpuTicker() {
 			cpuInfo := Info.GetCpuInfo()
 			//推送
 			for k, conn := range connCpuMap {
-				cpuData := UserSort.CpuData(cpuInfo).Clone().Sort(k)
-				err := conn.WriteJSON(gin.H{
-					"total": len(cpuData),
-					"rows":  cpuData,
-				})
-				if err != nil {
-					delete(connCpuMap, k)
-					delete(UserSort.SortCpuConfig, k)
-					fmt.Println("当前订阅cpu的连接总数：", len(connCpuMap))
-					fmt.Println(k, "cpu用户已断开")
-				}
+				go func(k string, conn *websocket.Conn) {
+					cpuData := UserSort.CpuData(cpuInfo).Clone().Sort(k)
+					err := conn.WriteJSON(gin.H{
+						"total": len(cpuData),
+						"rows":  cpuData,
+					})
+					if err != nil {
+						delete(connCpuMap, k)
+						delete(UserSort.SortCpuConfig, k)
+						fmt.Println("当前订阅cpu的连接总数：", len(connCpuMap))
+						fmt.Println(k, "cpu用户已断开")
+					}
+				}(k, conn)
 			}
 		}
 	}
@@ -159,17 +161,19 @@ func runMonitorNetTicker() {
 			netInfo := Info.GetNetInfo()
 			//推送
 			for k, conn := range connNetMap {
-				netData := UserSort.NetData(netInfo).Clone().Sort(k)
-				err := conn.WriteJSON(gin.H{
-					"total": len(netData),
-					"rows":  netData,
-				})
-				if err != nil {
-					delete(connNetMap, k)
-					delete(UserSort.SortNetConfig, k)
-					fmt.Println("当前订阅net的连接总数：", len(connNetMap))
-					fmt.Println(k, "net用户已断开")
-				}
+				go func(k string, conn *websocket.Conn) {
+					netData := UserSort.NetData(netInfo).Clone().Sort(k)
+					err := conn.WriteJSON(gin.H{
+						"total": len(netData),
+						"rows":  netData,
+					})
+					if err != nil {
+						delete(connNetMap, k)
+						delete(UserSort.SortNetConfig, k)
+						fmt.Println("当前订阅net的连接总数：", len(connNetMap))
+						fmt.Println(k, "net用户已断开")
+					}
+				}(k, conn)
 			}
 		}
 	}
@@ -187,17 +191,19 @@ func runMonitorProcessTicker() {
 			processInfo := Info.GetProcessInfo()
 			//推送
 			for k, conn := range connProcessMap {
-				processData := UserSort.ProcessData(processInfo).Clone().Sort(k)
-				err := conn.WriteJSON(gin.H{
-					"total": len(processData),
-					"rows":  processData,
-				})
-				if err != nil {
-					delete(connProcessMap, k)
-					delete(UserSort.SortProcessConfig, k)
-					fmt.Println("当前订阅process的连接总数：", len(connProcessMap))
-					fmt.Println(k, "process用户已断开")
-				}
+				go func(k string, conn *websocket.Conn) {
+					processData := UserSort.ProcessData(processInfo).Clone().Sort(k)
+					err := conn.WriteJSON(gin.H{
+						"total": len(processData),
+						"rows":  processData,
+					})
+					if err != nil {
+						delete(connProcessMap, k)
+						delete(UserSort.SortProcessConfig, k)
+						fmt.Println("当前订阅process的连接总数：", len(connProcessMap))
+						fmt.Println(k, "process用户已断开")
+					}
+				}(k, conn)
 			}
 		}
 	}
