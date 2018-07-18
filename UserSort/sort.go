@@ -109,6 +109,12 @@ func (data CpuData) Sort(addrs string) CpuData {
 	return data
 }
 
+func (data CpuData) Clone() CpuData {
+	cloneData := make(CpuData, len(data))
+	copy(cloneData, data)
+	return cloneData
+}
+
 type CustomNetSort struct {
 	NetList  []net.IOCountersStat
 	SortFunc func(ni, nj net.IOCountersStat) bool
@@ -147,6 +153,12 @@ func (data NetData) Sort(addrs string) NetData {
 		}
 	}
 	return data
+}
+
+func (data NetData) Clone() NetData {
+	cloneData := make(NetData, len(data))
+	copy(cloneData, data)
+	return cloneData
 }
 
 type CustomProcessSort struct {
@@ -190,4 +202,10 @@ func (data ProcessData) Sort(addrs string) ProcessData {
 		}
 	}
 	return data
+}
+
+func (data ProcessData) Clone() ProcessData {
+	cloneData := make(ProcessData, len(data))
+	copy(cloneData, data)
+	return cloneData
 }

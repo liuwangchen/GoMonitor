@@ -131,7 +131,7 @@ func runMonitorCpuTicker() {
 			cpuInfo := Info.GetCpuInfo()
 			//推送
 			for k, conn := range connCpuMap {
-				cpuData := UserSort.CpuData(cpuInfo).Sort(k)
+				cpuData := UserSort.CpuData(cpuInfo).Clone().Sort(k)
 				err := conn.WriteJSON(gin.H{
 					"total": len(cpuData),
 					"rows":  cpuData,
@@ -159,7 +159,7 @@ func runMonitorNetTicker() {
 			netInfo := Info.GetNetInfo()
 			//推送
 			for k, conn := range connNetMap {
-				netData := UserSort.NetData(netInfo).Sort(k)
+				netData := UserSort.NetData(netInfo).Clone().Sort(k)
 				err := conn.WriteJSON(gin.H{
 					"total": len(netData),
 					"rows":  netData,
@@ -187,7 +187,7 @@ func runMonitorProcessTicker() {
 			processInfo := Info.GetProcessInfo()
 			//推送
 			for k, conn := range connProcessMap {
-				processData := UserSort.ProcessData(processInfo).Sort(k)
+				processData := UserSort.ProcessData(processInfo).Clone().Sort(k)
 				err := conn.WriteJSON(gin.H{
 					"total": len(processData),
 					"rows":  processData,
@@ -205,18 +205,33 @@ func runMonitorProcessTicker() {
 
 func ReceiveCpu(message string, conn *websocket.Conn) {
 	u, _ := url.Parse(message)
-	property := u.Query().Get("property")
-	UserSort.SetCpuSortConfig(conn.RemoteAddr().String(), property)
+	switch u.Path {
+	case "sort":
+		{
+			property := u.Query().Get("property")
+			UserSort.SetCpuSortConfig(conn.RemoteAddr().String(), property)
+		}
+	}
 }
 
 func ReceiveNet(message string, conn *websocket.Conn) {
 	u, _ := url.Parse(message)
-	property := u.Query().Get("property")
-	UserSort.SetNetSortConfig(conn.RemoteAddr().String(), property)
+	switch u.Path {
+	case "sort":
+		{
+			property := u.Query().Get("property")
+			UserSort.SetNetSortConfig(conn.RemoteAddr().String(), property)
+		}
+	}
 }
 
 func ReceiveProcess(message string, conn *websocket.Conn) {
 	u, _ := url.Parse(message)
-	property := u.Query().Get("property")
-	UserSort.SetProcessSortConfig(conn.RemoteAddr().String(), property)
+	switch u.Path {
+	case "sort":
+		{
+			property := u.Query().Get("property")
+			UserSort.SetProcessSortConfig(conn.RemoteAddr().String(), property)
+		}
+	}
 }

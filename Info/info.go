@@ -27,6 +27,7 @@ type ProcessInfo struct {
 	Id            int32   `json:"id"`
 	CPUPercent    float64 `json:"cpu_percent"`
 	Status        string  `json:"status"`
+	StartProgram  string  `json:"startProgram"`
 }
 
 func GetCpuInfo() []CpuInfo {
