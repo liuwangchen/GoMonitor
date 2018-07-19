@@ -8,6 +8,8 @@ import (
 	"log"
 	"net/http"
 	"net/url"
+	"os"
+	"path/filepath"
 	"runtime"
 	"time"
 
@@ -70,8 +72,13 @@ func main() {
 	gin.SetMode(gin.DebugMode)
 	r := gin.Default()
 	//启动静态服务
-	r.Static("/resources", "Views/")
-	r.LoadHTMLFiles("Views/index.html")
+	dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(dir)
+	r.Static("/resources", dir+"/Views/")
+	r.LoadHTMLFiles(dir + "/Views/index.html")
 	r.GET("/", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "index.html", gin.H{})
 	})
