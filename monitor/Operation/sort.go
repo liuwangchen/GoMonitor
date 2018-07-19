@@ -1,8 +1,8 @@
 package Operation
 
 import (
-	"GoMonitor/Config"
-	"GoMonitor/Info"
+	"GoMonitor/monitor/Config"
+	"GoMonitor/monitor/Info"
 	"reflect"
 	"sort"
 

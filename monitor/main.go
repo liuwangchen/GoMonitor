@@ -1,9 +1,9 @@
 package main
 
 import (
-	"GoMonitor/Config"
-	"GoMonitor/Info"
-	"GoMonitor/Operation"
+	"GoMonitor/monitor/Config"
+	"GoMonitor/monitor/Info"
+	"GoMonitor/monitor/Operation"
 	"fmt"
 	"log"
 	"net/http"
@@ -70,8 +70,8 @@ func main() {
 	gin.SetMode(gin.DebugMode)
 	r := gin.Default()
 	//启动静态服务
-	r.Static("/resources", "../Views/")
-	r.LoadHTMLFiles("../Views/index.html")
+	r.Static("/resources", "Views/")
+	r.LoadHTMLFiles("/Views/index.html")
 	r.GET("/", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "index.html", gin.H{})
 	})

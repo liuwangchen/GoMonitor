@@ -1,7 +1,7 @@
 package Operation
 
 import (
-	"GoMonitor/Info"
+	"GoMonitor/monitor/Info"
 
 	"github.com/shirou/gopsutil/net"
 )
