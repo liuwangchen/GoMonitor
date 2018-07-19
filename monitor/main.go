@@ -71,7 +71,7 @@ func main() {
 	r := gin.Default()
 	//启动静态服务
 	r.Static("/resources", "Views/")
-	r.LoadHTMLFiles("/Views/index.html")
+	r.LoadHTMLFiles("Views/index.html")
 	r.GET("/", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "index.html", gin.H{})
 	})
