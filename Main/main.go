@@ -2,7 +2,7 @@ package main
 
 import (
 	"GoMonitor/Info"
-	"GoMonitor/UserSort"
+	"GoMonitor/Operation"
 	"fmt"
 	"log"
 	"net/http"
@@ -132,14 +132,14 @@ func runMonitorCpuTicker() {
 			//推送
 			for k, conn := range connCpuMap {
 				go func(k string, conn *websocket.Conn) {
-					cpuData := UserSort.CpuData(cpuInfo).Clone().Sort(k)
+					cpuData := Operation.CpuData(cpuInfo).Monitor(k).Search(k).Sort(k)
 					err := conn.WriteJSON(gin.H{
 						"total": len(cpuData),
 						"rows":  cpuData,
 					})
 					if err != nil {
 						delete(connCpuMap, k)
-						delete(UserSort.SortCpuConfig, k)
+						delete(Operation.OperaCpuConfig, k)
 						fmt.Println("当前订阅cpu的连接总数：", len(connCpuMap))
 						fmt.Println(k, "cpu用户已断开")
 					}
@@ -162,14 +162,14 @@ func runMonitorNetTicker() {
 			//推送
 			for k, conn := range connNetMap {
 				go func(k string, conn *websocket.Conn) {
-					netData := UserSort.NetData(netInfo).Clone().Sort(k)
+					netData := Operation.NetData(netInfo).Monitor(k).Search(k).Sort(k)
 					err := conn.WriteJSON(gin.H{
 						"total": len(netData),
 						"rows":  netData,
 					})
 					if err != nil {
 						delete(connNetMap, k)
-						delete(UserSort.SortNetConfig, k)
+						delete(Operation.OperaNetConfig, k)
 						fmt.Println("当前订阅net的连接总数：", len(connNetMap))
 						fmt.Println(k, "net用户已断开")
 					}
@@ -192,14 +192,14 @@ func runMonitorProcessTicker() {
 			//推送
 			for k, conn := range connProcessMap {
 				go func(k string, conn *websocket.Conn) {
-					processData := UserSort.ProcessData(processInfo).Clone().Sort(k)
+					processData := Operation.ProcessData(processInfo).Monitor(k).Search(k).Sort(k)
 					err := conn.WriteJSON(gin.H{
 						"total": len(processData),
 						"rows":  processData,
 					})
 					if err != nil {
 						delete(connProcessMap, k)
-						delete(UserSort.SortProcessConfig, k)
+						delete(Operation.OperaProcessConfig, k)
 						fmt.Println("当前订阅process的连接总数：", len(connProcessMap))
 						fmt.Println(k, "process用户已断开")
 					}
@@ -215,7 +215,7 @@ func ReceiveCpu(message string, conn *websocket.Conn) {
 	case "sort":
 		{
 			property := u.Query().Get("property")
-			UserSort.SetCpuSortConfig(conn.RemoteAddr().String(), property)
+			Operation.SetCpuSortConfig(conn.RemoteAddr().String(), property)
 		}
 	}
 }
@@ -226,7 +226,7 @@ func ReceiveNet(message string, conn *websocket.Conn) {
 	case "sort":
 		{
 			property := u.Query().Get("property")
-			UserSort.SetNetSortConfig(conn.RemoteAddr().String(), property)
+			Operation.SetNetSortConfig(conn.RemoteAddr().String(), property)
 		}
 	}
 }
@@ -237,7 +237,7 @@ func ReceiveProcess(message string, conn *websocket.Conn) {
 	case "sort":
 		{
 			property := u.Query().Get("property")
-			UserSort.SetProcessSortConfig(conn.RemoteAddr().String(), property)
+			Operation.SetProcessSortConfig(conn.RemoteAddr().String(), property)
 		}
 	}
 }
