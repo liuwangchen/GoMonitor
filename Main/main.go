@@ -1,6 +1,7 @@
 package main
 
 import (
+	"GoMonitor/Config"
 	"GoMonitor/Info"
 	"GoMonitor/Operation"
 	"fmt"
@@ -139,7 +140,7 @@ func runMonitorCpuTicker() {
 					})
 					if err != nil {
 						delete(connCpuMap, k)
-						delete(Operation.OperaCpuConfig, k)
+						delete(Config.OperaCpuConfig, k)
 						fmt.Println("当前订阅cpu的连接总数：", len(connCpuMap))
 						fmt.Println(k, "cpu用户已断开")
 					}
@@ -169,7 +170,7 @@ func runMonitorNetTicker() {
 					})
 					if err != nil {
 						delete(connNetMap, k)
-						delete(Operation.OperaNetConfig, k)
+						delete(Config.OperaNetConfig, k)
 						fmt.Println("当前订阅net的连接总数：", len(connNetMap))
 						fmt.Println(k, "net用户已断开")
 					}
@@ -199,7 +200,7 @@ func runMonitorProcessTicker() {
 					})
 					if err != nil {
 						delete(connProcessMap, k)
-						delete(Operation.OperaProcessConfig, k)
+						delete(Config.OperaProcessConfig, k)
 						fmt.Println("当前订阅process的连接总数：", len(connProcessMap))
 						fmt.Println(k, "process用户已断开")
 					}
@@ -215,7 +216,7 @@ func ReceiveCpu(message string, conn *websocket.Conn) {
 	case "sort":
 		{
 			property := u.Query().Get("property")
-			Operation.SetCpuSortConfig(conn.RemoteAddr().String(), property)
+			Config.SetCpuSortConfig(conn.RemoteAddr().String(), property)
 		}
 	}
 }
@@ -226,7 +227,7 @@ func ReceiveNet(message string, conn *websocket.Conn) {
 	case "sort":
 		{
 			property := u.Query().Get("property")
-			Operation.SetNetSortConfig(conn.RemoteAddr().String(), property)
+			Config.SetNetSortConfig(conn.RemoteAddr().String(), property)
 		}
 	}
 }
@@ -237,7 +238,7 @@ func ReceiveProcess(message string, conn *websocket.Conn) {
 	case "sort":
 		{
 			property := u.Query().Get("property")
-			Operation.SetProcessSortConfig(conn.RemoteAddr().String(), property)
+			Config.SetProcessSortConfig(conn.RemoteAddr().String(), property)
 		}
 	}
 }

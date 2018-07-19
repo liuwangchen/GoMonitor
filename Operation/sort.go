@@ -1,6 +1,7 @@
 package Operation
 
 import (
+	"GoMonitor/Config"
 	"GoMonitor/Info"
 	"reflect"
 	"sort"
@@ -27,7 +28,7 @@ func (cs CustomCpuSort) Less(i, j int) bool {
 
 //Sort 根据用户配置来进行Cpu数据排序
 func (data CpuData) Sort(conn string) CpuData {
-	if sc, ok := OperaCpuConfig[conn]; ok {
+	if sc, ok := Config.OperaCpuConfig[conn]; ok {
 		if len(sc.SortPropertyName) > 0 {
 			sortData := data.Clone()
 			uc := CustomCpuSort{
@@ -41,7 +42,7 @@ func (data CpuData) Sort(conn string) CpuData {
 					return false
 				},
 			}
-			if sc.Ad == ASC {
+			if sc.Ad == Config.ASC {
 				sort.Sort(uc)
 			} else {
 				sort.Sort(sort.Reverse(uc))
@@ -74,7 +75,7 @@ func (cs CustomNetSort) Less(i, j int) bool {
 
 //Sort 根据用户配置来进行Net数据排序
 func (data NetData) Sort(conn string) NetData {
-	if sc, ok := OperaNetConfig[conn]; ok {
+	if sc, ok := Config.OperaNetConfig[conn]; ok {
 		if len(sc.SortPropertyName) > 0 {
 			sortData := data.Clone()
 			uc := CustomNetSort{
@@ -88,7 +89,7 @@ func (data NetData) Sort(conn string) NetData {
 					return false
 				},
 			}
-			if sc.Ad == ASC {
+			if sc.Ad == Config.ASC {
 				sort.Sort(uc)
 			} else {
 				sort.Sort(sort.Reverse(uc))
@@ -121,7 +122,7 @@ func (cs CustomProcessSort) Less(i, j int) bool {
 
 //Sort 根据用户配置来进行进程数据排序
 func (data ProcessData) Sort(conn string) ProcessData {
-	if sc, ok := OperaProcessConfig[conn]; ok {
+	if sc, ok := Config.OperaProcessConfig[conn]; ok {
 		if len(sc.SortPropertyName) > 0 {
 			sortData := data.Clone()
 			uc := CustomProcessSort{
@@ -138,7 +139,7 @@ func (data ProcessData) Sort(conn string) ProcessData {
 					return false
 				},
 			}
-			if sc.Ad == ASC {
+			if sc.Ad == Config.ASC {
 				sort.Sort(uc)
 			} else {
 				sort.Sort(sort.Reverse(uc))
