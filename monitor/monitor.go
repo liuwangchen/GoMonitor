@@ -136,14 +136,14 @@ func runMonitorCpuTicker() {
 	}()
 	for range time.NewTicker(time.Second * 2).C {
 		if len(connCpuMap) > 0 {
-			cpuInfo := Info.GetCpuInfo()
+			cpuData := Operation.CpuData(Info.GetCpuInfo()).Monitor()
 			//推送
 			for k, conn := range connCpuMap {
 				go func(k string, conn *websocket.Conn) {
-					cpuData := Operation.CpuData(cpuInfo).Monitor(k).Search(k).Sort(k)
+					returnData := cpuData.Search(k).Sort(k)
 					err := conn.WriteJSON(gin.H{
-						"total": len(cpuData),
-						"rows":  cpuData,
+						"total": len(returnData),
+						"rows":  returnData,
 					})
 					if err != nil {
 						delete(connCpuMap, k)
@@ -166,14 +166,14 @@ func runMonitorNetTicker() {
 	}()
 	for range time.NewTicker(time.Second * 1).C {
 		if len(connNetMap) > 0 {
-			netInfo := Info.GetNetInfo()
+			netData := Operation.NetData(Info.GetNetInfo()).Monitor()
 			//推送
 			for k, conn := range connNetMap {
 				go func(k string, conn *websocket.Conn) {
-					netData := Operation.NetData(netInfo).Monitor(k).Search(k).Sort(k)
+					returnData := netData.Search(k).Sort(k)
 					err := conn.WriteJSON(gin.H{
-						"total": len(netData),
-						"rows":  netData,
+						"total": len(returnData),
+						"rows":  returnData,
 					})
 					if err != nil {
 						delete(connNetMap, k)
@@ -196,14 +196,14 @@ func runMonitorProcessTicker() {
 	}()
 	for range time.NewTicker(time.Second * 1).C {
 		if len(connProcessMap) > 0 {
-			processInfo := Info.GetProcessInfo()
+			processData := Operation.ProcessData(Info.GetProcessInfo()).Monitor()
 			//推送
 			for k, conn := range connProcessMap {
 				go func(k string, conn *websocket.Conn) {
-					processData := Operation.ProcessData(processInfo).Monitor(k).Search(k).Sort(k)
+					returnData := processData.Search(k).Sort(k)
 					err := conn.WriteJSON(gin.H{
-						"total": len(processData),
-						"rows":  processData,
+						"total": len(returnData),
+						"rows":  returnData,
 					})
 					if err != nil {
 						delete(connProcessMap, k)

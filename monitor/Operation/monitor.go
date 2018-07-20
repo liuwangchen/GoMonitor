@@ -1,13 +1,13 @@
 package Operation
 
-func (data CpuData) Monitor(conn string) CpuData {
+func (data CpuData) Monitor() CpuData {
 	return data
 }
 
-func (data NetData) Monitor(conn string) NetData {
+func (data NetData) Monitor() NetData {
 	return data
 }
 
-func (data ProcessData) Monitor(conn string) ProcessData {
+func (data ProcessData) Monitor() ProcessData {
 	return data
 }
