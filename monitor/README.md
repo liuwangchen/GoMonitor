@@ -1,7 +1,7 @@
 # GoMonitor
 EasyMonitor
 
-![Image text](https://raw.githubusercontent.com/liuwangchen/GoMonitor/master/Image/monitor.png)
+![Image text](https://raw.githubusercontent.com/liuwangchen/GoMonitor/master/monitor/Image/monitor.png)
 
 主页：http://localhost:8080/ 
 <br/>cpu接口：ws://localhost:8080/monitorCpu
